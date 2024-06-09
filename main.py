@@ -57,8 +57,15 @@ def centered_spinner(text):
 st.set_page_config(page_title="AISR", page_icon="🏀")
 
 
-# Set the title of the Streamlit app
-st.title('AI Sports Recap')
+col1, col2 = st.columns([1, 6])  # Adjust the ratio as needed
+
+# Add the image in the first column
+with col1:
+    st.image('sports_logo.png', width=100)  # Adjust width as needed
+
+# Add the title in the second column
+with col2:
+    st.title('AI Sports Recap')
 
 # Create a text input field for the URL
 url_input = st.text_input('Enter a URL:', '')
@@ -86,12 +93,12 @@ if "messages" not in st.session_state:
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"], unsafe_allow_html=True)
+        A = st.markdown(message["content"], unsafe_allow_html=True)
 
 if prompt := st.chat_input("What is up?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
-        st.markdown(prompt, unsafe_allow_html=True)
+        B = st.markdown(prompt, unsafe_allow_html=True)
 
     with st.chat_message("assistant"):
         idx = video_names.index(selected_option)
@@ -144,9 +151,9 @@ if prompt := st.chat_input("What is up?"):
         video_file = open('combined_video.mp4', 'rb')
         video_bytes = video_file.read()
 
-        st.markdown(summarized_content, unsafe_allow_html=True)
+        C = st.markdown(summarized_content, unsafe_allow_html=True)
 
-        st.markdown("<h3>Highlights</h3>", unsafe_allow_html=True)
+        D = st.markdown("<h3>Highlights</h3>", unsafe_allow_html=True)
         st.video(video_bytes)
 
     social_media_links = [
@@ -165,7 +172,16 @@ if prompt := st.chat_input("What is up?"):
     social_media_icons = SocialMediaIcons(social_media_links)
     social_media_icons.render()
 
-    st.button('Reload Page!!', on_click=refresh_state)
+    # if st.button('Refresh'):
+    #     A.empty()
+    #     B.empty()
+    #     C.empty()
+    #     D.empty()
+    #     # st.experimental_rerun()
+
+    # if st.button('Hard Refresh'):
+    #     # JavaScript to reload the page
+    #     st.write('<script>location.reload()</script>', unsafe_allow_html=True)
 
     st.session_state.messages.append({"role": "assistant", "content": summarized_content})
 
