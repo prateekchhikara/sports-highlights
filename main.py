@@ -42,7 +42,7 @@ def centered_spinner(text):
 
 
 
-st.set_page_config(page_title="AISP", page_icon="🏀")
+st.set_page_config(page_title="AISR", page_icon="🏀")
 
 
 # Set the title of the Streamlit app
@@ -75,8 +75,11 @@ if submit_button:
 
     index_id = os.environ.get("INDEX_ID")
 
+
     transcript_string = generate_transcript(index_id, video_id)
+    # st.write(transcript_string)
     gpt_content = get_text_from_gpt(text_input, transcript_string)
+    # st.write(gpt_content)
     final_clippings = get_intervals(gpt_content)
     clipped_video = get_clippings_from_intervals(video_details[idx]["video_url"], final_clippings)
 
@@ -94,13 +97,13 @@ if submit_button:
     # clip.audio.write_audiofile("theaudio.mp3")
     # clip.close()
 
-    clip = mp.VideoFileClip("combined_video.mp4")
-    clip.audio.write_audiofile("theaudio.mp3")
-    clip.close()
+    # clip = mp.VideoFileClip("combined_video.mp4")
+    # clip.audio.write_audiofile("theaudio.mp3")
+    # clip.close()
 
-    emotion = GET_EMOTION()
+    # emotion = GET_EMOTION()
 
-    st.write(f"Emotion: {emotion}")
+    # st.write(f"Emotion: {emotion}")
 
     
     load_circle.empty()
@@ -109,7 +112,13 @@ if submit_button:
     video_bytes = video_file.read()
 
     # st.text_area("Summary", value=summarized_content, height=200)
+    st.markdown("<h3>Summary</h3>", unsafe_allow_html=True)
     st.markdown(summarized_content, unsafe_allow_html=True)
+
+    # text_to_copy = st.markdown(summarized_content, unsafe_allow_html=True)
+    # hosted_html_file = "https://everydayswag.org/files/copy.html"
+    # iframe_url = f"{hosted_html_file}?copy={text_to_copy}"
+    # st.markdown(f'<iframe src="{iframe_url}"></iframe>', unsafe_allow_html=True)
 
     st.markdown("<h3>Highlights</h3>", unsafe_allow_html=True)
     st.video(video_bytes)

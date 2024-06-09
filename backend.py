@@ -67,7 +67,7 @@ def get_summary_and_title_from_gpt(question, transcript, video_title):
     model="gpt-4o",
     messages=[
             {"role": "system", "content": "You are the best sports editor who understands all sports very intricately. You are capable of summarizing sports interviews. You write newspaper articles and give very catchy titles to them."},
-            {"role": "user", "content": f"Give a catchy title and news article in the following format. <b>TITLE: <title></b>\n <article> for a press conference excerpt about {video_title} which answer the question: {question}. The news excerpt is: {transcript}. Separate the paragrpahs in the article with <p> tags. The format is <p align='justify'> Paragraph <p>. Strictly limit your article to two paragraphs only."},
+            {"role": "user", "content": f"Give a catchy title and news article in the following format. <h3> <title> </h3>\n <article> for a press conference excerpt about {video_title} which answer the question: {question}. The news excerpt is: {transcript}. Separate the paragrpahs in the article with <p> tags. The format is <p align='justify'> Paragraph <p>. Strictly limit your article to two paragraphs only."},
         ]
     )
     
@@ -83,7 +83,7 @@ def get_text_from_gpt(question, transcript):
     model="gpt-4o",
     messages=[
         {"role": "system", "content": "You are the best sports editor who understands all sports very intricately. You are capable of summarizing text by picking the right sentences from a list of sentences of interviews. You pick sentences so that the resultant block answers the question asked. You will be given a transcript containing a list of sentences followed by the start time (start=) and end time (end=) of when it occurs in a video. For a selected sentence, also check whether the next sentence in combination with current selected sentence adds more value and context to the answer. If yes, pick both individually."},
-        {"role": "system", "content": "Your output should be in this format: <Sentence> | start= | end=. Just give answer."},
+        {"role": "system", "content": "Each line in your output should be strictly in this format: '<Sentence> | start= | end= \n'. Just give answer. DO NOT GET RID OF THE | SYMBOLS AT ANY COST."},
         {"role": "user", "content": f'''{question}
         {transcript}'''}
         ]
