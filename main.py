@@ -2,7 +2,8 @@ import streamlit as st
 import streamlit.components.v1 as components
 import os
 from emotion import GET_EMOTION
-from tlabs import transcript, get_transcript
+from backend import generate_transcript, get_intervals, get_text_from_gpt, get_clippings_from_intervals
+# from tlabs import transcript, get_transcript
 from constants import *
 from video import GET_TRIMMED_VIDEO
 import moviepy.editor as mp
@@ -59,39 +60,47 @@ if submit_button:
 
     index_id = os.environ.get("INDEX_ID")
 
-    transcription_list = [1]
+    # transcription_list = [1]
 
     # transcription_list, start_points, end_points = get_transcript(index_id, video_id)
+    transcript_string = generate_transcript(index_id, video_id)
+    gpt_content = get_text_from_gpt(text_input, transcript_string)
+    final_clippings = get_intervals(gpt_content)
+    clipped_video = get_clippings_from_intervals(video_details[idx]["video_url"], final_clippings)
 
-    for i in range(len(transcription_list)):
+    # for i in range(len(transcription_list)):
         # st.write(f"Transcription: {transcription_list[i]}")
         # st.write(f"Start Time: {start_points[i]}")
         # st.write(f"End Time: {end_points[i]}")
         # st.write("")
 
 
-        video = GET_TRIMMED_VIDEO()
+    # video = GET_TRIMMED_VIDEO()
 
-        clip = mp.VideoFileClip("Donut (15-Second Ad).mp4")
-        clip.audio.write_audiofile("theaudio.mp3")
-        clip.close()
+    # clip = mp.VideoFileClip("Donut (15-Second Ad).mp4")
+    # clip.audio.write_audiofile("theaudio.mp3")
+    # clip.close()
 
-        emotion = GET_EMOTION()
+    clip = mp.VideoFileClip("combined_video.mp4")
+    clip.audio.write_audiofile("theaudio.mp3")
+    clip.close()
 
-        st.write(f"Emotion: {emotion}")
+    emotion = GET_EMOTION()
 
-        video_file = open('Donut (15-Second Ad).mp4', 'rb')
-        video_bytes = video_file.read()
+    st.write(f"Emotion: {emotion}")
 
-
-        st.text_area("Output", value="omkar", height=200)
-
-        st.write("Generated Highlight:")
-        st.video(video_bytes)
+    video_file = open('combined_video.mp4', 'rb')
+    video_bytes = video_file.read()
 
 
+    st.text_area("Output", value=gpt_content, height=200)
+
+    st.write("Generated Highlight:")
+    st.video(video_bytes)
 
 
-    exit()
 
-    transcript(index_id, url_input)
+
+exit()
+
+transcript(index_id, url_input)
