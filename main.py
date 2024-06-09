@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import os
+import re
 
 from emotion import GET_EMOTION
 from backend import generate_transcript, get_intervals, get_text_from_gpt, get_clippings_from_intervals, get_summary_and_title_from_gpt
@@ -156,6 +157,10 @@ if prompt := st.chat_input("What is up?"):
         D = st.markdown("<h3>Highlights</h3>", unsafe_allow_html=True)
         st.video(video_bytes)
 
+    def striphtml(data):
+        p = re.compile(r'<.*?>')
+        return p.sub('', data)
+
     social_media_links = [
         """
             http://www.facebook.com/dialog/feed?  
@@ -166,7 +171,7 @@ if prompt := st.chat_input("What is up?"):
             message=Andy Murray Hints at Retirement Possibilities but Stays Focused on the Present  Wimbledon&
         """,
         # "https://www.instagram.com/ThisIsAnExampleLink",
-        f"http://twitter.com/share?text={summarized_content[:20]}&url=http://url goes here&hashtags=hashtag1,hashtag2,hashtag3",
+        f"http://twitter.com/share?text={video_details[idx]['video_name']}&url=http://url goes here&hashtags=hashtag1,hashtag2,hashtag3",
     ]
 
     social_media_icons = SocialMediaIcons(social_media_links)
@@ -247,9 +252,6 @@ if submit_button:
     st.markdown("<h3>Highlights</h3>", unsafe_allow_html=True)
     st.video(video_bytes)
 
-    
-
-
     social_media_links = [
         """
             http://www.facebook.com/dialog/feed?  
@@ -260,7 +262,7 @@ if submit_button:
             message=Andy Murray Hints at Retirement Possibilities but Stays Focused on the Present  Wimbledon&
         """,
         # "https://www.instagram.com/ThisIsAnExampleLink",
-        f"http://twitter.com/share?text={gpt_content}&url=http://url goes here&hashtags=hashtag1,hashtag2,hashtag3",
+        f"http://twitter.com/share?text={gpt_content}&hashtags=hashtag1,hashtag2,hashtag3",
     ]
 
     social_media_icons = SocialMediaIcons(social_media_links)
