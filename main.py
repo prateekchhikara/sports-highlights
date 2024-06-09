@@ -10,6 +10,40 @@ import moviepy.editor as mp
 from st_social_media_links import SocialMediaIcons
 
 
+def centered_spinner(text):
+    text_placeholder = st.empty()
+    return text_placeholder.markdown(
+        f"""
+        <div style="display: flex; justify-content: center; align-items: center; height: 200px;">
+            <div>
+                <h2 style="text-align: center;">{text}</h2>
+                <div style="display: flex; justify-content: center;">
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </div>
+        <style>
+            .loader {{
+                border: 8px solid #f3f3f3; /* Light grey */
+                border-top: 8px solid #3498db; /* Blue */
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                animation: spin 2s linear infinite;
+            }}
+            @keyframes spin {{
+                0% {{ transform: rotate(0deg); }}
+                100% {{ transform: rotate(360deg); }}
+            }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+
+st.set_page_config(page_title="AISP", page_icon="🏀")
+
 
 # Set the title of the Streamlit app
 st.title('AI Sports Recap')
@@ -28,58 +62,24 @@ submit_button = st.button('Submit')
 
 
 
-social_media_links = [
-    """
-        http://www.facebook.com/dialog/feed?  
-        app_id=123050457758183&  
-        link=http://developers.facebook.com/docs/reference/dialogs/&
-        picture=http://fbrell.com/f8.jpg&  
-        name=Facebook%20Dialogs&  
-        caption=Reference%20Documentation& 
-        description=Dialogs%20provide%20a%20simple,%20consistent%20interface%20for%20applications%20to%20interact%20with%20users.&
-        message=text goes here&
-        redirect_uri=http://www.example.com/response
-    """,
-    # "https://www.instagram.com/ThisIsAnExampleLink",
-    "http://twitter.com/share?text=text goes here&url=http://url goes here&hashtags=hashtag1,hashtag2,hashtag3",
-]
-
-social_media_icons = SocialMediaIcons(social_media_links)
-social_media_icons.render()
-
+st.write(" ")
+st.write(" ")
 
 
 # Handle the submit button click
 if submit_button:
-    # Display the entered URL and text
-    st.write('Entered URL:', url_input)
-    st.write('Entered Text:', text_input)
+    load_circle = centered_spinner('Please wait... 🕰️👀')
     idx = video_names.index(selected_option)
 
     video_id = video_details[idx]["video_id"]
 
     index_id = os.environ.get("INDEX_ID")
 
-    # transcription_list = [1]
-
-    # transcription_list, start_points, end_points = get_transcript(index_id, video_id)
     transcript_string = generate_transcript(index_id, video_id)
     gpt_content = get_text_from_gpt(text_input, transcript_string)
     final_clippings = get_intervals(gpt_content)
     clipped_video = get_clippings_from_intervals(video_details[idx]["video_url"], final_clippings)
 
-    # for i in range(len(transcription_list)):
-        # st.write(f"Transcription: {transcription_list[i]}")
-        # st.write(f"Start Time: {start_points[i]}")
-        # st.write(f"End Time: {end_points[i]}")
-        # st.write("")
-
-
-    # video = GET_TRIMMED_VIDEO()
-
-    # clip = mp.VideoFileClip("Donut (15-Second Ad).mp4")
-    # clip.audio.write_audiofile("theaudio.mp3")
-    # clip.close()
 
     clip = mp.VideoFileClip("combined_video.mp4")
     clip.audio.write_audiofile("theaudio.mp3")
@@ -89,18 +89,42 @@ if submit_button:
 
     st.write(f"Emotion: {emotion}")
 
+    
+    load_circle.empty()
+
     video_file = open('combined_video.mp4', 'rb')
     video_bytes = video_file.read()
 
 
-    st.text_area("Output", value=gpt_content, height=200)
+    gpt_content = gpt_content.replace("\n", " ").replace("*", "").replace("#", "").replace("~", "")
+    gpt_content = gpt_content.replace("   ", " ").replace("  ", " ").replace('"', '')
+    gpt_content = gpt_content.strip()
+    st.text_area("Output", value=gpt_content, height=400, disabled=True)
 
     st.write("Generated Highlight:")
     st.video(video_bytes)
 
+
+    social_media_links = [
+        """
+            http://www.facebook.com/dialog/feed?  
+            app_id=123050457758183&  
+            link=http://developers.facebook.com/&
+            caption=Reference%20Documentation& 
+            description=Andy Murray Hints at Retirement Possibilities but Stays Focused on the Present  Wimbledon&
+            message=Andy Murray Hints at Retirement Possibilities but Stays Focused on the Present  Wimbledon&
+        """,
+        # "https://www.instagram.com/ThisIsAnExampleLink",
+        f"http://twitter.com/share?text={gpt_content}&url=http://url goes here&hashtags=hashtag1,hashtag2,hashtag3",
+    ]
+
+    social_media_icons = SocialMediaIcons(social_media_links)
+    social_media_icons.render()
 
 
 
 exit()
 
 transcript(index_id, url_input)
+
+
