@@ -86,12 +86,12 @@ if "messages" not in st.session_state:
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+        st.markdown(message["content"], unsafe_allow_html=True)
 
 if prompt := st.chat_input("What is up?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.markdown(prompt, unsafe_allow_html=True)
 
     with st.chat_message("assistant"):
         idx = video_names.index(selected_option)
@@ -108,7 +108,7 @@ if prompt := st.chat_input("What is up?"):
                     {"role": "system", "content": "You are the best sports editor who understands all sports very intricately. You are capable of summarizing text by picking the right sentences from a list of sentences of interviews. You pick sentences so that the resultant block answers the question asked. You will be given a transcript containing a list of sentences followed by the start time (start=) and end time (end=) of when it occurs in a video. For a selected sentence, also check whether the next sentence in combination with current selected sentence adds more value and context to the answer. If yes, pick both individually."},
                     {"role": "system", "content": "Each line in your output should be strictly in this format: '<Sentence> | start= | end= \n'."},
                     {"role": "system", "content": "Just give answer."},
-                    {"role": "system", "content": "DO NOT GET RID OF THE | SYMBOLS AT ANY COST."},
+                    {"role": "system", "content": "DO NOT GET RID OF THE | SYMBOLS  AND TIMESTAMPS AT ANY COST."},
                     {"role": "user", "content": f'''{prompt}
                     {transcript_string}'''}
                     ],
@@ -136,7 +136,7 @@ if prompt := st.chat_input("What is up?"):
             response = stream.choices[0].message.content
             final_clippings = get_intervals(response)
 
-            
+
 
         clipped_video = get_clippings_from_intervals(video_details[idx]["video_url"], final_clippings)
         summarized_content = get_summary_and_title_from_gpt(prompt, transcript_string, video_details[idx]["video_name"])
@@ -167,7 +167,7 @@ if prompt := st.chat_input("What is up?"):
 
     st.button('Reload Page!!', on_click=refresh_state)
 
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    st.session_state.messages.append({"role": "assistant", "content": summarized_content})
 
 
 
