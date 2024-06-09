@@ -58,6 +58,22 @@ def generate_transcript(index_id, video_id):
 
 
 # Function to filter transcript for relevant content from ChatGPT
+def get_summary_and_title_from_gpt(question, transcript, video_title):
+    load_dotenv()
+    value = os.getenv('OPENAI_API_KEY')
+    client = OpenAI(api_key=value)
+
+    completion = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+            {"role": "system", "content": "You are the best sports editor who understands all sports very intricately. You are capable of summarizing sports interviews. You write newspaper articles and give very catchy titles to them."},
+            {"role": "user", "content": f"Give a catchy title and news article in the following format. <b>TITLE: <title></b>\n <article> for a press conference excerpt about {video_title} which answer the question: {question}. The news excerpt is: {transcript}. Separate the paragrpahs in the article with <p> tags. The format is <p align='justify'> Paragraph <p>. Strictly limit your article to two paragraphs only."},
+        ]
+    )
+    
+    return completion.choices[0].message.content
+
+
 def get_text_from_gpt(question, transcript):
     load_dotenv()
     value = os.getenv('OPENAI_API_KEY')
@@ -74,6 +90,8 @@ def get_text_from_gpt(question, transcript):
     )
     
     return completion.choices[0].message.content
+
+
 
 
 # Functions to parse from generated GPT content

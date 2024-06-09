@@ -2,7 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import os
 from emotion import GET_EMOTION
-from backend import generate_transcript, get_intervals, get_text_from_gpt, get_clippings_from_intervals
+from backend import generate_transcript, get_intervals, get_text_from_gpt, get_clippings_from_intervals, get_summary_and_title_from_gpt
 # from tlabs import transcript, get_transcript
 from constants import *
 from video import GET_TRIMMED_VIDEO
@@ -80,6 +80,19 @@ if submit_button:
     final_clippings = get_intervals(gpt_content)
     clipped_video = get_clippings_from_intervals(video_details[idx]["video_url"], final_clippings)
 
+    summarized_content = get_summary_and_title_from_gpt(text_input, transcript_string, video_details[idx]["video_name"])
+    # for i in range(len(transcription_list)):
+        # st.write(f"Transcription: {transcription_list[i]}")
+        # st.write(f"Start Time: {start_points[i]}")
+        # st.write(f"End Time: {end_points[i]}")
+        # st.write("")
+
+
+    # video = GET_TRIMMED_VIDEO()
+
+    # clip = mp.VideoFileClip("Donut (15-Second Ad).mp4")
+    # clip.audio.write_audiofile("theaudio.mp3")
+    # clip.close()
 
     clip = mp.VideoFileClip("combined_video.mp4")
     clip.audio.write_audiofile("theaudio.mp3")
@@ -95,13 +108,10 @@ if submit_button:
     video_file = open('combined_video.mp4', 'rb')
     video_bytes = video_file.read()
 
+    # st.text_area("Summary", value=summarized_content, height=200)
+    st.markdown(summarized_content, unsafe_allow_html=True)
 
-    gpt_content = gpt_content.replace("\n", " ").replace("*", "").replace("#", "").replace("~", "")
-    gpt_content = gpt_content.replace("   ", " ").replace("  ", " ").replace('"', '')
-    gpt_content = gpt_content.strip()
-    st.text_area("Output", value=gpt_content, height=400, disabled=True)
-
-    st.write("Generated Highlight:")
+    st.markdown("<h3>Highlights</h3>", unsafe_allow_html=True)
     st.video(video_bytes)
 
 
