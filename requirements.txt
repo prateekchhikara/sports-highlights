@@ -1,0 +1,8 @@
+torchaudio
+funasr
+modelscope
+streamlit
+twelvelabs
+moviepy
+requests
+st_social_media_links
