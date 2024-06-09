@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import os
+
 from emotion import GET_EMOTION
 from backend import generate_transcript, get_intervals, get_text_from_gpt, get_clippings_from_intervals, get_summary_and_title_from_gpt
 # from tlabs import transcript, get_transcript
@@ -8,6 +9,17 @@ from constants import *
 from video import GET_TRIMMED_VIDEO
 import moviepy.editor as mp
 from st_social_media_links import SocialMediaIcons
+from feedback import FEEDBACK
+from openai import OpenAI
+
+# Initialize session state variable if it doesn't exist
+if 'refresh' not in st.session_state:
+    st.session_state.refresh = 0
+
+# Function to increment the state
+def refresh_state():
+    st.session_state.refresh += 1
+
 
 
 def centered_spinner(text):
@@ -53,17 +65,114 @@ url_input = st.text_input('Enter a URL:', '')
 st.write('OR')
 selected_option = st.selectbox('Select an option:', video_names)
 
-# Create a text area for additional text input
-text_input = st.text_area('Enter Your Question:')
+# # Create a text area for additional text input
+# text_input = st.text_area('Enter Your Question:')
 
-# Create a submit button
-submit_button = st.button('Submit')
-
-
+# # Create a submit button
+# submit_button = st.button('Submit')
 
 
 st.write(" ")
 st.write(" ")
+
+value = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=value)
+
+if "openai_model" not in st.session_state:
+    st.session_state["openai_model"] = "gpt-4o"
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+if prompt := st.chat_input("What is up?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    with st.chat_message("assistant"):
+        idx = video_names.index(selected_option)
+        video_id = video_details[idx]["video_id"]
+        index_id = os.environ.get("INDEX_ID")
+        transcript_string = generate_transcript(index_id, video_id)
+        # gpt_content = get_text_from_gpt(prompt, transcript_string)
+        # final_clippings = get_intervals(gpt_content)
+
+        try:
+            stream = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": "You are the best sports editor who understands all sports very intricately. You are capable of summarizing text by picking the right sentences from a list of sentences of interviews. You pick sentences so that the resultant block answers the question asked. You will be given a transcript containing a list of sentences followed by the start time (start=) and end time (end=) of when it occurs in a video. For a selected sentence, also check whether the next sentence in combination with current selected sentence adds more value and context to the answer. If yes, pick both individually."},
+                    {"role": "system", "content": "Each line in your output should be strictly in this format: '<Sentence> | start= | end= \n'."},
+                    {"role": "system", "content": "Just give answer."},
+                    {"role": "system", "content": "DO NOT GET RID OF THE | SYMBOLS AT ANY COST."},
+                    {"role": "user", "content": f'''{prompt}
+                    {transcript_string}'''}
+                    ],
+                    stream=False,
+                )
+
+            response = stream.choices[0].message.content
+    
+
+            final_clippings = get_intervals(response)
+        except:
+            stream = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": "You are the best sports editor who understands all sports very intricately. You are capable of summarizing text by picking the right sentences from a list of sentences of interviews. You pick sentences so that the resultant block answers the question asked. You will be given a transcript containing a list of sentences followed by the start time (start=) and end time (end=) of when it occurs in a video. For a selected sentence, also check whether the next sentence in combination with current selected sentence adds more value and context to the answer. If yes, pick both individually."},
+                    {"role": "system", "content": "Each line in your output should be strictly in this format: '<Sentence> | start= | end= \n'."},
+                    {"role": "system", "content": "Just give answer."},
+                    {"role": "system", "content": "DO NOT GET RID OF THE | SYMBOLS AT ANY COST."},
+                    {"role": "user", "content": f'''{prompt}
+                    {transcript_string}'''}
+                    ],
+                    stream=False,
+                )
+
+            response = stream.choices[0].message.content
+            final_clippings = get_intervals(response)
+
+            
+
+        clipped_video = get_clippings_from_intervals(video_details[idx]["video_url"], final_clippings)
+        summarized_content = get_summary_and_title_from_gpt(prompt, transcript_string, video_details[idx]["video_name"])
+
+        video_file = open('combined_video.mp4', 'rb')
+        video_bytes = video_file.read()
+
+        st.markdown(summarized_content, unsafe_allow_html=True)
+
+        st.markdown("<h3>Highlights</h3>", unsafe_allow_html=True)
+        st.video(video_bytes)
+
+    social_media_links = [
+        """
+            http://www.facebook.com/dialog/feed?  
+            app_id=123050457758183&  
+            link=http://developers.facebook.com/&
+            caption=Reference%20Documentation& 
+            description=Andy Murray Hints at Retirement Possibilities but Stays Focused on the Present  Wimbledon&
+            message=Andy Murray Hints at Retirement Possibilities but Stays Focused on the Present  Wimbledon&
+        """,
+        # "https://www.instagram.com/ThisIsAnExampleLink",
+        f"http://twitter.com/share?text={summarized_content[:20]}&url=http://url goes here&hashtags=hashtag1,hashtag2,hashtag3",
+    ]
+
+    social_media_icons = SocialMediaIcons(social_media_links)
+    social_media_icons.render()
+
+    st.button('Reload Page!!', on_click=refresh_state)
+
+    st.session_state.messages.append({"role": "assistant", "content": response})
+
+
+
+
+exit()
 
 
 # Handle the submit button click
@@ -74,6 +183,8 @@ if submit_button:
     video_id = video_details[idx]["video_id"]
 
     index_id = os.environ.get("INDEX_ID")
+
+    
 
     transcript_string = generate_transcript(index_id, video_id)
     gpt_content = get_text_from_gpt(text_input, transcript_string)
@@ -113,6 +224,8 @@ if submit_button:
 
     st.markdown("<h3>Highlights</h3>", unsafe_allow_html=True)
     st.video(video_bytes)
+
+    
 
 
     social_media_links = [
