@@ -1,4 +1,9 @@
+![](images/logo.png)
+
 # AI Sports Recap
+
+[![YouTube](https://badges.aleen42.com/src/youtube.svg)](https://www.youtube.com/watch?v=eQq1tuUM8Kg&ab_channel=TanmayRode) [![Static Badge](https://img.shields.io/badge/Grounded_SAM-arXiv-blue)](https://devpost.com/software/aisr-ai-sports-recap)
+
 
 AI Sports Recap is a Streamlit-based application designed to generate video highlights and textual summaries of sports press conferences given a YouTube video link. The app leverages cutting-edge technologies including OpenAI's GPT-4o, Pegasus1 by TwelveLabs, and Docker for seamless integration and deployment.
 
@@ -84,9 +89,19 @@ The main components of the application are as follows:
 3. **Sharing**:
    - Users can share the generated content on Facebook and Twitter directly from the app.
 
+
 ## Acknowledgements
 
 - OpenAI for their powerful GPT-4o model.
 - TwelveLabs for Pegasus1 API.
 - Streamlit for the user-friendly frontend framework.
 - Docker for the containerization and ease of deployment.
+
+
+## Contributors
+
+Our project wouldn't be possible without the contributions of these amazing people! Thank you all for making this project better.
+
+<a href="https://github.com/prateekchhikara/sports-highlights/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=prateekchhikara/sports-highlights" />
+</a>
