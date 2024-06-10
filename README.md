@@ -2,7 +2,7 @@
 
 # AI Sports Recap
 
-[![YouTube](https://badges.aleen42.com/src/youtube.svg)](https://www.youtube.com/watch?v=eQq1tuUM8Kg&ab_channel=TanmayRode) [![Static Badge](https://img.shields.io/badge/Grounded_SAM-arXiv-blue)](https://devpost.com/software/aisr-ai-sports-recap)
+[![YouTube](https://badges.aleen42.com/src/youtube.svg)](https://www.youtube.com/watch?v=eQq1tuUM8Kg&ab_channel=TanmayRode) [![Static Badge](https://img.shields.io/badge/Hackathon-arXiv-blue)](https://devpost.com/software/aisr-ai-sports-recap) [![Static Badge](https://img.shields.io/badge/Slides-arXiv-blue)](https://docs.google.com/presentation/d/1YEhu7m4gaHgPfpTJ9w4AgPQeHx0Mfa_bjN1Rn14zaEk/edit#slide=id.g2e457b686f3_1_229) 
 
 
 AI Sports Recap is a Streamlit-based application designed to generate video highlights and textual summaries of sports press conferences given a YouTube video link. The app leverages cutting-edge technologies including OpenAI's GPT-4o, Pegasus1 by TwelveLabs, and Docker for seamless integration and deployment.
@@ -20,6 +20,8 @@ AI Sports Recap is a Streamlit-based application designed to generate video high
 2. **Highlight Extraction**: Identifies and extracts key video segments that are relevant to the user's query.
 3. **Summary Generation**: Creates a concise summary of the press conference.
 4. **Social Media Sharing**: Allows users to share the generated summary and highlights on social media platforms.
+
+![](images/features.png)
 
 ## Installation
 
@@ -47,6 +49,10 @@ AI Sports Recap is a Streamlit-based application designed to generate video high
    ```
 
 3. **Build and run the Docker container**
+
+    ```
+    docker compose up --build
+    ```
 
 4. **Access the application**
    Open your browser and go to `http://localhost:8501`.
